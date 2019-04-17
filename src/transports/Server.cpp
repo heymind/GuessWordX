@@ -75,22 +75,37 @@ void Server::start(int port) {
 
     fcntl(this->sock_fd, F_SETFL, O_NONBLOCK);
 
+    RequestMessage request;
+    vector<ResponseMessage> responses;
 
     for (;;) {
         auto *msg = new Message;
         if (poll(msg)) {
-            ServerSideRequestMessage serverSideRequestMessage  = {
-                    .session = msg.session,
-                    .msg = {
-                            .
-                    }
+            responses.clear();
+            request = {
+                    .session = msg->session,
+                    .msg = stringToClientSideRequestMessage(msg->data)
             };
-            s2vvs(msg->data);
+            for (auto endpoint : endpoints) {
+                if (endpoint.handle(request, responses)) goto handled;
+            }
+            responses.push_back(
+                    {
+                            .session = request.session,
+                            .msg = {
+                                    .eventName = request.msg.actionName,
+                                    .errmsg = "Action not impl by backend yet."
+                            }
+                    });
+
+            handled:
+            for (auto r : responses) {
+                msg->session = r.session;
+                msg->data = clientSideResponseMessageToString(r.msg);
+                send(msg);
+            }
         }
     }
-
-
-    return;
 }
 
 bool Server::registerEndpoint(AbstractRequestEndpoint &endpoint) {
