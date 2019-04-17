@@ -12,6 +12,8 @@ cmake-build-debug/
 cmake-build-release/
 .idea/
 
+**/ui_**.h
+
 ## CMake Ignore Files
 CMakeCache.txt
 CMakeFiles
