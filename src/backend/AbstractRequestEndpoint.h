@@ -23,7 +23,8 @@
 }while(0)
 
 class AbstractRequestEndpoint {
-    virtual bool handle(RequestMessage &req, vector<ResponseMessage> &responses) = 0;
+public:
+    virtual bool handle(RequestMessage &req, vector<ResponseMessage> &responses) {};
 };
 
 
