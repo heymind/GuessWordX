@@ -5,15 +5,12 @@
 #ifndef PROJECT_REGISTERENDPOINT_H
 #define PROJECT_REGISTERENDPOINT_H
 
-#include "../AbstractRequestEndpoint.h"
+#include "../BasicEndpoint.h"
 
-class RegisterEndpoint : public AbstractRequestEndpoint {
-private:
-    sqlite::database db;
+class RegisterEndpoint : public BasicEndpoint {
+
 public:
     bool handle(RequestMessage &req, vector<ResponseMessage> &responses) override;
-
-    RegisterEndpoint(const sqlite::database &db);
 
 
 };

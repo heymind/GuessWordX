@@ -16,4 +16,3 @@ bool RegisterEndpoint::handle(RequestMessage &req, std::vector<ResponseMessage> 
 
 }
 
-RegisterEndpoint::RegisterEndpoint(const sqlite::database &db) : db(db) {}

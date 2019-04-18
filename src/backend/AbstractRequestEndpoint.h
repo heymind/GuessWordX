@@ -18,6 +18,9 @@
     db << query >> _r; \
     responses.push_back({.session = req.session,.msg = {.eventName = (_eventName) ,.rows=_r,.errmsg=""}});\
 }while(0)
+#define NOTIFY_DATA(_eventName, _r) do{ \
+    responses.push_back({.session = req.session,.msg = {.eventName = (_eventName) ,.rows=_r,.errmsg=""}});\
+}while(0)
 #define NOTIFY_ERR(_eventName, _errmsg) do{ \
     responses.push_back({.session = req.session,.msg = {.eventName = (_eventName) ,.rows={},.errmsg=(_errmsg)}});\
 }while(0)
