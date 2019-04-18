@@ -7,7 +7,7 @@
 
 #include "../AbstractRequestEndpoint.h"
 
-class RegisterEndpoint : AbstractRequestEndpoint {
+class RegisterEndpoint : public AbstractRequestEndpoint {
 private:
     sqlite::database db;
 public:

@@ -14,7 +14,6 @@
 #include <assert.h>
 #include <list>
 #include <arpa/inet.h>
-
 #include <errno.h>
 
 
@@ -23,6 +22,7 @@
 #include "Server.h"
 
 int Server::send(Message *msg) {
+    printf("send to [%d]:%s\n",msg->session,msg->data.c_str());
     return ::send(msg->session, msg->data.c_str(), msg->data.size(), 0);
 }
 
@@ -39,20 +39,21 @@ int Server::poll(Message *msg) {
     }
     char buffer[1024];
     for (int fd:fds) {
-        int n = recv(fd, buffer, sizeof(buffer), MSG_PEEK);
+        int n = recv(fd, buffer, sizeof(buffer), 0);
         if (n == 0 && errno == EWOULDBLOCK) {
             printf("[Server] Bye-bye fd = %d\n", fd);
             fds.remove(fd);
             return poll(msg);
         }
         if (n > 0) {
-            assert(false && "receive");
+//            assert(false && "receive");
             msg->session = fd;
             buffer[n] = '\0';
             msg->data = buffer;
             return 0;
         }
     }
+    return 1;
 }
 
 void Server::start(int port) {
@@ -67,7 +68,7 @@ void Server::start(int port) {
     listen_addr.sin_addr.s_addr = INADDR_ANY; /* auto-fill with my IP */
     bzero(&(listen_addr.sin_zero), 8);        /* zero the rest of the struct */
 
-//    rc = bind(this->sock_fd, (struct sockaddr *) &listen_addr, sizeof(struct sockaddr));
+    rc = ::bind(this->sock_fd, (struct sockaddr *) &listen_addr, sizeof(struct sockaddr));
     assert(rc != -1 && "[Server]Bind Error.");
 
     rc = listen(this->sock_fd, MAX_CLIENT);
@@ -77,17 +78,18 @@ void Server::start(int port) {
 
     RequestMessage request;
     vector<ResponseMessage> responses;
-
+    auto *msg = new Message;
     for (;;) {
-        auto *msg = new Message;
-        if (poll(msg)) {
+
+        if (!poll(msg)) {
+            printf("received from [%d] %s\n",msg->session,msg->data.c_str());
             responses.clear();
             request = {
                     .session = msg->session,
                     .msg = stringToClientSideRequestMessage(msg->data)
             };
             for (auto endpoint : endpoints) {
-                if (endpoint.handle(request, responses)) goto handled;
+                if (endpoint->handle(request, responses)) goto handled;
             }
             responses.push_back(
                     {
@@ -104,11 +106,12 @@ void Server::start(int port) {
                 msg->data = clientSideResponseMessageToString(r.msg);
                 send(msg);
             }
+
         }
     }
 }
 
-bool Server::registerEndpoint(AbstractRequestEndpoint &endpoint) {
+bool Server::registerEndpoint(AbstractRequestEndpoint *endpoint) {
     endpoints.push_back(endpoint);
     return true;
 }

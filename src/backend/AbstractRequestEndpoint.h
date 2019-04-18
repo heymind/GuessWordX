@@ -9,7 +9,7 @@
 
 #define BEGIN_HANDLE(action) try { if(req.msg.actionName == (action)) {
 #define THEN_HANDLE(action) return true;} else if (req.msg.actionName == (action)) {
-#define END_HANDLE return true;} else {return false;} } catch(exception &e) {NOTIFY_ERR(req.msg.actionName,e.what());}
+#define END_HANDLE return true;} else {return false;} } catch(exception &e) {NOTIFY_ERR(req.msg.actionName,e.what());return true;}
 #define PARAM(i) (req.msg.params[(i)])
 #define NOTIFY(_query)  NOTIFY_WITH((req.msg.actionName),_query)
 
@@ -24,7 +24,7 @@
 
 class AbstractRequestEndpoint {
 public:
-    virtual bool handle(RequestMessage &req, vector<ResponseMessage> &responses) {};
+    virtual bool handle(RequestMessage &req, vector<ResponseMessage> &responses) = 0;
 };
 
 

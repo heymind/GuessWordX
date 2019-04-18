@@ -26,11 +26,12 @@ public:
     int send(Message *msg);
 
     void start(int port);
+    bool registerEndpoint(AbstractRequestEndpoint *endpoint) override;
 
 private:
-    vector<AbstractRequestEndpoint> endpoints;
+    vector<AbstractRequestEndpoint*> endpoints;
 
-    bool registerEndpoint(AbstractRequestEndpoint &endpoint) override;
+
 };
 
 

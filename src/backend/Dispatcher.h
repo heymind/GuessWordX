@@ -8,7 +8,7 @@
 #include "./AbstractRequestEndpoint.h"
 
 class Dispatcher {
-    virtual bool registerEndpoint(AbstractRequestEndpoint &endpoint) = 0;
+    virtual bool registerEndpoint(AbstractRequestEndpoint *endpoint) = 0;
 };
 
 #endif //BACKEND_DISPATCHER_H
